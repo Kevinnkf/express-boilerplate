@@ -1,22 +1,22 @@
-<!-- src/components/sections/ProjectsSection.vue -->
+<!-- src/components/sections/skillsSection.vue -->
 <template>
-  <div class="projects-section">
-    <h2 class="section-title">Projects</h2>
-    <p class="section-subtitle">Things I've built and worked on</p>
+  <div class="skills-section">
+    <h2 class="section-title">Skills</h2>
+    <p class="section-subtitle"></p>
     
-    <div v-if="loading" class="loading">Loading projects...</div>
+    <div v-if="loading" class="loading">Loading skills...</div>
     <div v-else-if="error" class="error">{{ error }}</div>
     
-    <div v-else class="projects-grid">
+    <div v-else class="skills-grid">
       <div 
-        v-for="project in projects" 
-        :key="project.id" 
-        class="project-card"
+        v-for="skill in skills" 
+        :key="skill.id" 
+        class="skill-card"
       >
-        <div class="project-header">
-          <h3 class="project-title">{{ project.name }}</h3>
-          <div class="project-links">
-            <a v-if="project.url" :href="project.url" target="_blank" class="project-link">
+        <div class="skill-header">
+          <h3 class="skill-title">{{ skill.name }}</h3>
+          <div class="skill-links">
+            <a v-if="skill.url" :href="skill.url" target="_blank" class="skill-link">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2"></path>
                 <polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2"></polyline>
@@ -26,10 +26,10 @@
           </div>
         </div>
         
-        <p class="project-description">{{ project.description }}</p>
+        <p class="skill-description">{{ skill.description }}</p>
         
-        <div v-if="project.imageUrl" class="project-image">
-          <img :src="project.imageUrl" :alt="project.name" />
+        <div v-if="skill.imageUrl" class="skill-image">
+          <img :src="skill.imageUrl" :alt="skill.name" />
         </div>
       </div>
     </div>
@@ -38,36 +38,36 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { projectsAPI } from '@/services/api'
+import { skillsAPI } from '@/services/api'
 
 export default {
-  name: 'ProjectsSection',
+  name: 'skillsSection',
   setup() {
-    const projects = ref([])
+    const skills = ref([])
     const loading = ref(false)
     const error = ref(null)
 
-    const loadProjects = async () => {
+    const loadskills = async () => {
       loading.value = true
       error.value = null
       try {
-        const response = await projectsAPI.getAll()
-        projects.value = response.data
-        console.log('Projects loaded:', projects.value)
+        const response = await skillsAPI.getAll()
+        skills.value = response.data
+        console.log('skills loaded:', skills.value)
       } catch (err) {
-        error.value = 'Failed to load projects'
-        console.error('Error loading projects:', err)
+        error.value = 'Failed to load skills'
+        console.error('Error loading skills:', err)
       } finally {
         loading.value = false
       }
     }
 
     onMounted(() => {
-      loadProjects()    
+      loadskills()    
     })
 
     return {
-      projects,
+      skills,
       loading,
       error
     }
@@ -76,7 +76,7 @@ export default {
 </script>
 
 <style scoped>
-.projects-section {
+.skills-section {
   max-width: 100%;
 }
 
@@ -93,13 +93,13 @@ export default {
   margin-bottom: 2rem;
 }
 
-.projects-grid {
+.skills-grid {
   display: flex;
   flex-direction: column;
   gap: 2rem;
 }
 
-.project-card {
+.skill-card {
   background: var(--bg-secondary);
   border-radius: 12px;
   padding: 2rem;
@@ -107,54 +107,54 @@ export default {
   transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.project-card:hover {
+.skill-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
-.project-header {
+.skill-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   margin-bottom: 1rem;
 }
 
-.project-title {
+.skill-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-secondary);
   margin: 0;
 }
 
-.project-links {
+.skill-links {
   display: flex;
   gap: 0.5rem;
 }
 
-.project-link {
+.skill-link {
   color: var(--text-secondary);
   padding: 0.5rem;
   border-radius: 6px;
   transition: background-color 0.3s, color 0.3s;
 }
 
-.project-link:hover {
+.skill-link:hover {
   background-color: var(--border);
   color: var(--accent);
 }
 
-.project-description {
+.skill-description {
   color: var(--text-secondary);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
 
-.project-image {
+.skill-image {
   border-radius: 8px;
   overflow: hidden;
 }
 
-.project-image img {
+.skill-image img {
   width: 100%;
   height: auto;
   border-radius: 8px;

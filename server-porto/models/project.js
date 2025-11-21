@@ -11,10 +11,15 @@ export default (sequelize, DataTypes) => {
         name: { type: DataTypes.STRING, allowNull: false },
         description: { type: DataTypes.TEXT, allowNull: true},
         url: { type: DataTypes.STRING, allowNull: true},
-        imageUrl: { type: DataTypes.STRING, allowNull: true}
-    }, {
+        imageUrl: { type: DataTypes.STRING, allowNull: true},
+        dateStarted: { type: DataTypes.DATE, allowNull: true},
+        dateCompleted: { type: DataTypes.DATE, allowNull: true},
+        
+    }, 
+    {
         sequelize,
         modelName: 'Project',
+        tableName: 'projects',
     });
     return Project;
 }

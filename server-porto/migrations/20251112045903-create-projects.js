@@ -24,6 +24,8 @@ export default {
         type: Sequelize.STRING,
         allowNull: true
       },
+      dateStarted:{ type: Sequelize.DATE, allowNull: true },
+      dateCompleted:{ type: Sequelize.DATE, allowNull: true },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -35,7 +37,7 @@ export default {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
-    await queryInterface.addIndex('Projects', ['name']);
+    await queryInterface.addIndex('projects', ['name']);
   },
 
   async down(queryInterface, Sequelize) {

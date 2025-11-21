@@ -31,7 +31,6 @@ export default {
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
-    await queryInterface.addIndex('Projects', ['name']);
   },
 
   async down (queryInterface, Sequelize) {

@@ -14,17 +14,17 @@
           <AboutSection />
         </section> -->
         
-        <!-- <section id="experience" class="section">
+        <section id="experience" class="section">
           <ExperienceSection />
-        </section> -->
+        </section>
         
         <section id="projects" class="section">
           <ProjectsSection />
         </section>
 
-        <!-- <section id="skills" class="section">
+        <section id="skills" class="section">
           <SkillsSection />
-        </section> -->
+        </section>
 
         <!-- <section id="contact" class="section">
           <ContactSection />
@@ -38,9 +38,9 @@
 import { ref } from 'vue'
 import SidebarContent from '@/components/layout/SidebarContent.vue'
 // import AboutSection from '@/components/sections/AboutSection.vue'
-// import ExperienceSection from '@/components/sections/ExperienceSection.vue'
+import ExperienceSection from '@/components/sections/ExperienceSection.vue'
 import ProjectsSection from '@/components/sections/ProjectSection.vue'
-// import SkillsSection from '@/components/sections/SkillsSection.vue'
+import SkillsSection from '@/components/sections/SkillsSection.vue'
 // import ContactSection from '@/components/sections/ContactSection.vue'
 
 export default {
@@ -48,9 +48,9 @@ export default {
   components: {
     SidebarContent,
     // AboutSection,
-    // ExperienceSection,
+    ExperienceSection,
     ProjectsSection,
-    // SkillsSection,
+    SkillsSection,
     // ContactSection
   },
   setup() {

@@ -9,7 +9,7 @@ export default{
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.createTable('Experiences', {
+    await queryInterface.createTable('experiences', {
       id: {allowNull: false, autoIncrement: true, primaryKey: true, type: Sequelize.INTEGER},
       company: {type:Sequelize.STRING, allowNull: false},
       role: {type: Sequelize.STRING, allowNull: false},
@@ -36,6 +36,6 @@ export default{
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.dropTable('Experiences');
+    await queryInterface.dropTable('experiences');
   }
 };
