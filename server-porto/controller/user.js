@@ -5,18 +5,27 @@ const User = db.User;
 export const getAllUsers = async (req, res) => {
     try {
         const Users = await User.findAll();
-        res.status(200).json(Users);    
+        res.status(200).json(Users);
     } catch (error) {
-        res.status(500).json({message: error.message, "Error": "Cannot get Users"});
+        res.status(500).json({ message: error.message, "Error": "Cannot get Users" });
     }
 }
 
+import bcrypt from 'bcryptjs';
+
 export const createUser = async (req, res) => {
     try {
-        const Users = await User.create(req.body);
-        res.status(201).json(Users);
+        const { username, email, password, name } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = await User.create({
+            username,
+            email,
+            password: hashedPassword,
+            name
+        });
+        res.status(201).json(newUser);
     } catch (error) {
-        res.status(500).json({message: error.message, "Error": "Cannot create User"});
+        res.status(500).json({ message: error.message, "Error": "Cannot create User" });
     }
 }
 
@@ -31,7 +40,7 @@ export const updateUser = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({message: error.message, "Error": "Cannot update User"});        
+        res.status(500).json({ message: error.message, "Error": "Cannot update User" });
     }
 }
 
@@ -45,6 +54,6 @@ export const deleteUser = async (req, res) => {
             res.status(404).json({ message: 'User not found' });
         }
     } catch (error) {
-        res.status(500).json({message: error.message, "Error": "Cannot delete User"});
+        res.status(500).json({ message: error.message, "Error": "Cannot delete User" });
     }
 };

@@ -1,36 +1,64 @@
 <!-- src/components/sections/ExperienceSection.vue -->
 <template>
-  <div class="experiences-section">
-    <h2 class="section-title">Experiences</h2>
-    <!-- <p class="section-subtitle">Things I've built and worked on</p> -->
-    
-    <div v-if="loading" class="loading">Loading experiences...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    
-    <div v-else class="experiences-grid">
-      <div 
-        v-for="experience in experiences" 
-        :key="experience.id" 
-        class="experience-card"
+  <div>
+    <!-- Section Header -->
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">Experiences</h2>
+      <button
+        v-if="currentUser"
+        class="flex items-center gap-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors duration-200"
       >
-        <div class="experience-header">
-          <h3 class="experience-title">{{ experience.company }}</h3>
-          <div class="experience-links">
-            <a v-if="experience.url" :href="experience.url" target="_blank" class="experience-link">
+        + Add Experience
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="text-center py-12 text-gray-500 dark:text-gray-400 text-lg">
+      Loading experiences...
+    </div>
+
+    <!-- Error -->
+    <div v-else-if="error" class="text-center py-12 text-red-500 text-lg">{{ error }}</div>
+
+    <!-- List -->
+    <div v-else class="flex flex-col gap-6">
+      <div
+        v-for="experience in experiences"
+        :key="experience.id"
+        class="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 hover:-translate-y-1 hover:shadow-xl transition-all duration-300"
+      >
+        <!-- Card Header -->
+        <div class="flex items-start justify-between mb-3">
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white">{{ experience.company }}</h3>
+          <div class="flex items-center gap-2">
+            <template v-if="currentUser && currentUser.id === experience.userId">
+              <button
+                class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded hover:bg-blue-600 hover:border-blue-600 hover:text-white dark:hover:bg-blue-500 dark:hover:border-blue-500 transition-all duration-200"
+              >Edit</button>
+              <button
+                @click="deleteExperience(experience.id)"
+                class="px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 text-gray-600 dark:text-gray-300 rounded hover:bg-red-600 hover:border-red-600 hover:text-white dark:hover:bg-red-500 dark:hover:border-red-500 transition-all duration-200"
+              >Delete</button>
+            </template>
+            <a
+              v-if="experience.url"
+              :href="experience.url"
+              target="_blank"
+              class="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-all duration-200"
+            >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2"></path>
                 <polyline points="15 3 21 3 21 9" stroke="currentColor" stroke-width="2"></polyline>
                 <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" stroke-width="2"></line>
               </svg>
             </a>
-
           </div>
         </div>
-        
-        <p class="experience-description">{{ experience.description }}</p>
-        
-        <div v-if="experience.imageUrl" class="experience-image">
-          <img :src="experience.imageUrl" :alt="experience.name" />
+
+        <p class="text-gray-600 dark:text-gray-400 leading-relaxed">{{ experience.description }}</p>
+
+        <div v-if="experience.imageUrl" class="mt-4 rounded-lg overflow-hidden">
+          <img :src="experience.imageUrl" :alt="experience.company" class="w-full h-auto rounded-lg" />
         </div>
       </div>
     </div>
@@ -42,19 +70,19 @@ import { ref, onMounted } from 'vue'
 import { experiencesAPI } from '@/services/api'
 
 export default {
-  name: 'experiencesSection',
+  name: 'ExperienceSection',
+  props: { currentUser: Object },
   setup() {
     const experiences = ref([])
     const loading = ref(false)
     const error = ref(null)
 
-    const loadexperiences = async () => {
+    const loadExperiences = async () => {
       loading.value = true
       error.value = null
       try {
         const response = await experiencesAPI.getAll()
         experiences.value = response.data
-        console.log('experiences loaded:', experiences.value)
       } catch (err) {
         error.value = 'Failed to load experiences'
         console.error('Error loading experiences:', err)
@@ -63,111 +91,20 @@ export default {
       }
     }
 
-    onMounted(() => {
-      loadexperiences()    
-    })
-
-    return {
-      experiences,
-      loading,
-      error
+    const deleteExperience = async (id) => {
+      if (!confirm('Are you sure you want to delete this experience?')) return
+      try {
+        await experiencesAPI.delete(id)
+        experiences.value = experiences.value.filter(exp => exp.id !== id)
+      } catch (err) {
+        console.error('Failed to delete experience', err)
+        alert('Failed to delete experience')
+      }
     }
+
+    onMounted(loadExperiences)
+
+    return { experiences, loading, error, deleteExperience }
   }
 }
 </script>
-
-<style scoped>
-.experiences-section {
-  max-width: 100%;
-}
-
-.section-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
-}
-
-.section-subtitle {
-  font-size: 1.125rem;
-  color: var(--text-secondary);
-  margin-bottom: 2rem;
-}
-
-.experiences-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.experience-card {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 2rem;
-  border: 1px solid var(--border);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.experience-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-}
-
-.experience-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1rem;
-}
-
-.experience-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-.experience-links {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.experience-link {
-  color: var(--text-secondary);
-  padding: 0.5rem;
-  border-radius: 6px;
-  transition: background-color 0.3s, color 0.3s;
-}
-
-.experience-link:hover {
-  background-color: var(--border);
-  color: var(--accent);
-}
-
-.experience-description {
-  color: var(--text-secondary);
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-.experience-image {
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.experience-image img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-
-.loading, .error {
-  text-align: center;
-  padding: 2rem;
-  font-size: 1.125rem;
-}
-
-.error {
-  color: #e53e3e;
-}
-</style>

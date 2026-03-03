@@ -23,9 +23,9 @@ export const createSummary = async (req, res) => {
     try {
         const { content } = req.body;
         const newSummary = await Summary.create({
-            content
+            content,
+            userId: req.user.id
         });
-x``
         res.status(201).json(newSummary);
     } catch (error) {
         res.status(500).json({ message: 'Error creating summary', error });
@@ -36,18 +36,60 @@ export const updateSummary = async (req, res) => {
     try {
         const { id } = req.params;
         const { content } = req.body;
-        const [updated] = await Summary.update({ 
-            content 
-            },
+
+        const summary = await Summary.findByPk(id);
+        if (!summary) return res.status(404).json({ message: 'Summary not found' });
+
+        if (summary.userId !== req.user.id) {
+            return res.status(403).json({ message: 'Forbidden: You can only update your own summaries' });
+        }
+
+        const [updated] = await Summary.update({
+            content
+        },
             { where: { id } }
         );
         if (updated) {
             const updatedSummary = await Summary.findOne({ where: { id } });
             res.status(200).json(updatedSummary);
         } else {
+            res.status(404).json({ message: 'Summary update failed' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: 'Error updating summary', error });
+    }
+};
+
+export const getSummaryById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const summary = await Summary.findByPk(id);
+        if (summary) {
+            res.status(200).json(summary);
+        } else {
             res.status(404).json({ message: 'Summary not found' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Error updating project', error });
+        res.status(500).json({ message: 'Error retrieving summary', error: error.message });
+    }
+};
+
+export const deleteSummary = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const summary = await Summary.findByPk(id);
+
+        if (!summary) {
+            return res.status(404).json({ message: 'Summary not found' });
+        }
+
+        if (summary.userId !== req.user.id) {
+            return res.status(403).json({ message: 'Forbidden: You can only delete your own summaries' });
+        }
+
+        await summary.destroy();
+        res.status(200).json({ message: 'Summary deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error deleting summary', error: error.message });
     }
 };

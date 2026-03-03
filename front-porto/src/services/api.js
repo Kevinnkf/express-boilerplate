@@ -12,6 +12,16 @@ const api = axios.create({
   timeout: 10000,
 });
 
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
+
 // Simple configuration without interceptors for now
 export const experiencesAPI = {
   getAll: () => api.get('/experiences'),
@@ -28,7 +38,7 @@ export const projectsAPI = {
   delete: (id) => api.delete(`/projects/${id}`),
 };
 
-export const skillsAPI = {  
+export const skillsAPI = {
   getAll: () => api.get('/skills'),
   getById: (id) => api.get(`/skills/${id}`),
   create: (skillData) => api.post('/skills', skillData),

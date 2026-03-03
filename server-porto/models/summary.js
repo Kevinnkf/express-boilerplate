@@ -3,12 +3,12 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
     class Summary extends Model {
         static associate(models) {
-            // define association here if needed
+            Summary.belongsTo(models.User, { foreignKey: 'userId', as: 'user' });
         }
     }
     Summary.init({
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-        content: { type: DataTypes.TEXT, allowNull: true},
+        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+        content: { type: DataTypes.TEXT, allowNull: true },
     }, {
         sequelize,
         modelName: 'Summary',

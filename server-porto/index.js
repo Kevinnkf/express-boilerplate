@@ -13,7 +13,12 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
+import authRoutes from './routes/auth.js';
+import skillRoutes from './routes/skill.js';
+
 app.use('/api', routes);
+app.use('/api/auth', authRoutes);
+app.use('/api/skills', skillRoutes);
 
 app.get('/', (req, res) => {
     res.send('Welcome to my portofolio!');
@@ -21,7 +26,7 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Server is running at http://localhost:${port}/`);
-    
+
     console.log(`ENV is working: ${process.env.DB_NAME}`);
 
 });
