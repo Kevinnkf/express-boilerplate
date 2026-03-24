@@ -1,21 +1,25 @@
 import jwt from 'jsonwebtoken';
 import db from '../models/index.js';
 import bcrypt from 'bcryptjs';
+import { successResponse, errorResponse } from '../utils/responseHelper.js';
+import { logger } from '../utils/logger.js';
 
 const User = db.User;
 
-export const login = async (req, res) => {
+export const login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
         const user = await User.findOne({ where: { email } });
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            logger.warn('Login attempt with non-existent email', { email });
+            return errorResponse(res, 404, 'User not found');
         }
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(401).json({ message: 'Invalid credentials' });
+            logger.warn('Login attempt with invalid password', { email });
+            return errorResponse(res, 401, 'Invalid credentials');
         }
 
         const token = jwt.sign(
@@ -24,12 +28,14 @@ export const login = async (req, res) => {
             { expiresIn: '24h' }
         );
 
-        res.status(200).json({
-            message: 'Login successful',
+        logger.info('User logged in successfully', { userId: user.id, email: user.email });
+
+        successResponse(res, 200, 'Login successful', {
             token,
             user: { id: user.id, username: user.username, email: user.email, name: user.name }
         });
     } catch (error) {
-        res.status(500).json({ message: 'Error during login', error: error.message });
+        logger.error('Login error', { error: error.message });
+        next(error);
     }
 };

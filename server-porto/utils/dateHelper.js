@@ -5,8 +5,8 @@ export const formatMonth = (date = new Date()) => {
         "Aug", "Sep", "Oct",
         "Nov", "Dec"
     ];
-    const monthIndex = monthNames = [date.getMonth()];
+    const monthIndex = monthNames[date.getMonth()];
     const year = date.getFullYear();
     
     return `${monthIndex} ${year}`;
-}
+};

@@ -1,16 +1,17 @@
 import express from 'express';
-import summaryRoutes from './summary.js';
+import authRoutes from './auth.js';
 import projectRoutes from './projects.js';
 import userRoutes from './user.js';
-import experienceRoutes from './experiences.js';
 
 const router = express.Router();
 
-// public routes
-router.use('/summary', summaryRoutes);
-router.use('/projects', projectRoutes);
-router.use('/user', userRoutes);
-router.use('/experiences', experienceRoutes);
+// Auth routes (public)
+router.use('/auth', authRoutes);
 
+// User routes
+router.use('/users', userRoutes);
+
+// Project routes
+router.use('/projects', projectRoutes);
 
 export default router;

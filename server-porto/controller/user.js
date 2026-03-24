@@ -1,59 +1,122 @@
 import db from '../models/index.js';
+import bcrypt from 'bcryptjs';
+import { successResponse, errorResponse } from '../utils/responseHelper.js';
+import { logger } from '../utils/logger.js';
 
 const User = db.User;
 
-export const getAllUsers = async (req, res) => {
+export const getAllUsers = async (req, res, next) => {
     try {
-        const Users = await User.findAll();
-        res.status(200).json(Users);
+        const users = await User.findAll({
+            attributes: { exclude: ['password'] } // Don't return passwords
+        });
+        successResponse(res, 200, 'Users retrieved successfully', users);
     } catch (error) {
-        res.status(500).json({ message: error.message, "Error": "Cannot get Users" });
+        logger.error('Get all users error', { error: error.message });
+        next(error);
     }
-}
+};
 
-import bcrypt from 'bcryptjs';
+export const getUserById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
 
-export const createUser = async (req, res) => {
+        if (!id || isNaN(id)) {
+            return errorResponse(res, 400, 'Valid user ID is required');
+        }
+
+        const user = await User.findByPk(id, {
+            attributes: { exclude: ['password'] },
+            include: [
+                { association: 'projects', attributes: ['id', 'name', 'description'] },
+                { association: 'skills', attributes: ['id', 'name', 'level'] }
+            ]
+        });
+
+        if (!user) {
+            return errorResponse(res, 404, 'User not found');
+        }
+
+        successResponse(res, 200, 'User retrieved successfully', user);
+    } catch (error) {
+        logger.error('Get user by ID error', { error: error.message, userId: req.params.id });
+        next(error);
+    }
+};
+
+export const createUser = async (req, res, next) => {
     try {
         const { username, email, password, name } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
+
         const newUser = await User.create({
             username,
             email,
             password: hashedPassword,
             name
         });
-        res.status(201).json(newUser);
-    } catch (error) {
-        res.status(500).json({ message: error.message, "Error": "Cannot create User" });
-    }
-}
 
-export const updateUser = async (req, res) => {
+        logger.info('User created successfully', { userId: newUser.id, email });
+
+        successResponse(res, 201, 'User registered successfully', {
+            id: newUser.id,
+            username: newUser.username,
+            email: newUser.email,
+            name: newUser.name
+        });
+    } catch (error) {
+        logger.error('Create user error', { error: error.message });
+        next(error);
+    }
+};
+
+export const updateUser = async (req, res, next) => {
     try {
         const { id } = req.params;
-        const [updated] = await User.update(req.body, { where: { id } });
+
+        if (!id || isNaN(id)) {
+            return errorResponse(res, 400, 'Valid user ID is required');
+        }
+
+        // Don't allow password updates through this endpoint
+        const { password, ...updateData } = req.body;
+
+        const [updated] = await User.update(updateData, { where: { id } });
+
         if (updated) {
-            const updatedUser = await User.findOne({ where: { id } });
-            res.status(200).json(updatedUser);
+            const updatedUser = await User.findOne({
+                where: { id },
+                attributes: { exclude: ['password'] }
+            });
+            logger.info('User updated successfully', { userId: id });
+            successResponse(res, 200, 'User updated successfully', updatedUser);
         } else {
-            res.status(404).json({ message: 'User not found' });
+            return errorResponse(res, 404, 'User not found');
         }
     } catch (error) {
-        res.status(500).json({ message: error.message, "Error": "Cannot update User" });
+        logger.error('Update user error', { error: error.message, userId: req.params.id });
+        next(error);
     }
-}
+};
 
-export const deleteUser = async (req, res) => {
+export const deleteUser = async (req, res, next) => {
     try {
         const { id } = req.params;
+
+        if (!id || isNaN(id)) {
+            return errorResponse(res, 400, 'Valid user ID is required');
+        }
+
         const deleted = await User.destroy({ where: { id } });
+
         if (deleted) {
-            res.status(200).json({ message: 'User deleted successfully' });
+            logger.info('User deleted successfully', { userId: id });
+            successResponse(res, 200, 'User deleted successfully');
         } else {
-            res.status(404).json({ message: 'User not found' });
+            return errorResponse(res, 404, 'User not found');
         }
     } catch (error) {
-        res.status(500).json({ message: error.message, "Error": "Cannot delete User" });
+        logger.error('Delete user error', { error: error.message, userId: req.params.id });
+        next(error);
     }
 };

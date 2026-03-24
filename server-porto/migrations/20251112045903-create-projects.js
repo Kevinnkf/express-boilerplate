@@ -26,6 +26,16 @@ export default {
       },
       dateStarted:{ type: Sequelize.DATE, allowNull: true },
       dateCompleted:{ type: Sequelize.DATE, allowNull: true },
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id'
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,

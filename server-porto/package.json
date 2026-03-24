@@ -1,15 +1,30 @@
 {
-  "name": "porto-kevin",
+  "name": "porto-server",
   "version": "1.0.0",
+  "description": "Express.js API server boilerplate with PostgreSQL and Sequelize ORM",
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "migrate": "sequelize-cli db:migrate",
+    "migrate:undo": "sequelize-cli db:migrate:undo",
+    "migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "migrate:create": "sequelize-cli migration:create",
+    "seed": "sequelize-cli db:seed:all",
+    "seed:undo": "sequelize-cli db:seed:undo:all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "express",
+    "sequelize",
+    "postgresql",
+    "jwt",
+    "api",
+    "boilerplate"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cookie": "^1.0.2",
@@ -18,7 +33,6 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.3",
-    "parser": "^0.1.4",
     "pg": "^8.16.3",
     "sequelize": "^6.37.7"
   },
